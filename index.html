@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>互動式電子繪本</title>
+<style>
+:root { --ink:#342b27; --cream:#fff8e9; --accent:#a64b32; --gold:#e7bd69; }
+* { box-sizing:border-box; }
+body {
+  margin:0; min-height:100vh; color:var(--ink);
+  font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;
+  background:radial-gradient(circle at top,#fff9ec 0,#ead9b9 70%,#d6c19d 100%);
+  display:flex; flex-direction:column; align-items:center;
+}
+header { width:min(1100px,94vw); padding:22px 10px 12px; text-align:center; }
+h1 { margin:0 0 6px; font-size:clamp(22px,4vw,32px); letter-spacing:.08em; }
+.subtitle { margin:0; color:#766452; font-size:14px; }
+.book {
+  width:min(1050px,96vw); margin:12px auto 18px; padding:clamp(10px,2vw,22px);
+  background:rgba(255,250,239,.92); border:1px solid #d6c29c;
+  border-radius:18px; box-shadow:0 18px 45px #5e44252b;
+}
+.stage {
+  min-height: min(68vh,700px); display:flex; align-items:center; justify-content:center;
+  background:#211b18; border-radius:12px; overflow:hidden; position:relative;
+}
+.stage img { display:block; max-width:100%; max-height:68vh; object-fit:contain; }
+.page-label {
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:13px 2px 8px; color:#6d5947; font-size:14px;
+}
+.progress { height:5px; background:#eadfc9; border-radius:9px; overflow:hidden; }
+.progress span { display:block; height:100%; background:var(--accent); width:0; transition:width .2s; }
+.controls { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:10px; padding:15px 0 4px; }
+button {
+  border:0; border-radius:999px; padding:11px 20px; cursor:pointer;
+  color:white; background:var(--accent); font-size:15px; font-weight:600;
+}
+button.secondary { background:#78644f; }
+button:disabled { opacity:.35; cursor:not-allowed; }
+.audio-row { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin:10px 0 4px; }
+.audio-box { background:#f3ead9; border-radius:12px; padding:10px 14px; font-size:13px; }
+.audio-box audio { display:block; width:min(290px,75vw); margin-top:6px; height:34px; }
+.hint { text-align:center; font-size:12px; color:#897965; margin:10px 0 0; }
+@media(max-width:600px) {
+ .book { padding:9px; }
+ .stage { min-height:52vh; }
+ .stage img { max-height:52vh; }
+ button { padding:10px 15px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>互動式電子繪本</h1>
+  <p class="subtitle">翻閱圖畫、聆聽故事，跟著每一頁展開旅程</p>
+</header>
+<main class="book">
+  <div class="stage"><img id="pageImage" src="assets/graphics/0.jpg" alt="繪本第1頁"></div>
+  <div class="page-label"><span id="pageTitle">封面</span><span id="pageCount">1 / 20</span></div>
+  <div class="progress"><span id="progressBar"></span></div>
+  <div class="controls">
+    <button class="secondary" id="firstBtn">封面</button>
+    <button id="prevBtn">← 上一頁</button>
+    <button id="nextBtn">下一頁 →</button>
+    <button class="secondary" id="lastBtn">最後一頁</button>
+  </div>
+  <div class="audio-row">
+    <div class="audio-box">🎙️ 本頁故事語音<audio id="speechAudio" controls preload="metadata"></audio></div>
+    <div class="audio-box">🎵 本頁背景音樂<audio id="musicAudio" controls preload="metadata"></audio></div>
+  </div>
+  <p class="hint">小提醒：可使用鍵盤 ← → 翻頁；音訊可自行播放、暫停及調整音量。</p>
+</main>
+<script>
+const totalPages = 20;
+let page = 0;
+const image = document.getElementById('pageImage');
+const pageTitle = document.getElementById('pageTitle');
+const pageCount = document.getElementById('pageCount');
+const progressBar = document.getElementById('progressBar');
+const speech = document.getElementById('speechAudio');
+const music = document.getElementById('musicAudio');
+
+function showPage(n) {
+  page = Math.max(0, Math.min(totalPages - 1, n));
+  const num = page;
+  image.src = `assets/graphics/${num}.jpg`;
+  image.alt = page === 0 ? '繪本封面' : `繪本第${page}頁`;
+  pageTitle.textContent = page === 0 ? '封面' : `故事第 ${page} 頁`;
+  pageCount.textContent = `${page + 1} / ${totalPages}`;
+  progressBar.style.width = `${((page + 1) / totalPages) * 100}%`;
+  speech.pause(); music.pause();
+  speech.currentTime = 0; music.currentTime = 0;
+  speech.src = `assets/speech/speech${num}.mp3`;
+  music.src = `assets/music/music${num}.mp3`;
+  speech.load(); music.load();
+  document.getElementById('prevBtn').disabled = page === 0;
+  document.getElementById('nextBtn').disabled = page === totalPages - 1;
+}
+document.getElementById('firstBtn').addEventListener('click', () => showPage(0));
+document.getElementById('prevBtn').addEventListener('click', () => showPage(page - 1));
+document.getElementById('nextBtn').addEventListener('click', () => showPage(page + 1));
+document.getElementById('lastBtn').addEventListener('click', () => showPage(totalPages - 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') showPage(page + 1);
+  if (e.key === 'ArrowLeft') showPage(page - 1);
+});
+showPage(0);
+</script>
+</body>
+</html>
