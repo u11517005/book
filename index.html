@@ -57,7 +57,7 @@ button:disabled { opacity:.35; cursor:not-allowed; }
   <p class="subtitle">翻閱圖畫、聆聽故事，跟著每一頁展開旅程</p>
 </header>
 <main class="book">
-  <div class="stage"><img id="pageImage" src="assets/graphics/0.jpg" alt="繪本第1頁"></div>
+  <div class="stage"><img id="pageImage" src="graphics/0.jpg" alt="繪本第1頁"></div>
   <div class="page-label"><span id="pageTitle">封面</span><span id="pageCount">1 / 20</span></div>
   <div class="progress"><span id="progressBar"></span></div>
   <div class="controls">
@@ -85,15 +85,15 @@ const music = document.getElementById('musicAudio');
 function showPage(n) {
   page = Math.max(0, Math.min(totalPages - 1, n));
   const num = page;
-  image.src = `assets/graphics/${num}.jpg`;
+  image.src = `graphics/${num}.jpg`;
   image.alt = page === 0 ? '繪本封面' : `繪本第${page}頁`;
   pageTitle.textContent = page === 0 ? '封面' : `故事第 ${page} 頁`;
   pageCount.textContent = `${page + 1} / ${totalPages}`;
   progressBar.style.width = `${((page + 1) / totalPages) * 100}%`;
   speech.pause(); music.pause();
   speech.currentTime = 0; music.currentTime = 0;
-  speech.src = `assets/speech/speech${num}.mp3`;
-  music.src = `assets/music/music${num}.mp3`;
+  speech.src = `speech/speech${num}.mp3`;
+  music.src = `music/music${num}.mp3`;
   speech.load(); music.load();
   document.getElementById('prevBtn').disabled = page === 0;
   document.getElementById('nextBtn').disabled = page === totalPages - 1;
